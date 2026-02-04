@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 Valentine's Day Proposal Generator 💕</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .font-pacifico { font-family: 'Pacifico', cursive; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        
+        /* Floating hearts animation */
+        .heart {
+            position: fixed;
+            font-size: 1.5rem;
+            animation: float 4s ease-in-out infinite;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        @keyframes pulse-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .pulse-heart {
+            animation: pulse-heart 1s ease-in-out infinite;
+        }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .bounce-in {
+            animation: bounce-in 0.6s ease-out;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffeef8 0%, #fff0f5 50%, #ffe4ec 100%);
+        }
+
+        .card-shadow {
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.3);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-poppins overflow-hidden">
+    <!-- Floating Hearts Background -->
+    <div id="hearts-container"></div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl card-shadow p-8 md:p-12 max-w-md w-full bounce-in relative overflow-hidden">
+            <!-- Decorative elements -->
+            <div class="absolute -top-6 -right-6 text-6xl opacity-20">💕</div>
+            <div class="absolute -bottom-4 -left-4 text-5xl opacity-20">💗</div>
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4 pulse-heart">💝</div>
+                <h1 class="font-pacifico text-3xl md:text-4xl text-pink-500 mb-2">
+                    Valentine's Proposal
+                </h1>
+                <p class="text-gray-500 text-sm">Create a cute proposal for your special someone!</p>
+            </div>
+
+            <!-- Form -->
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-pink-600 font-semibold mb-2 text-sm">
+                        💕 Your Valentine's Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="valentineName" 
+                        placeholder="Enter their name..."
+                        class="w-full px-5 py-4 border-2 border-pink-200 rounded-2xl focus:border-pink-400 focus:outline-none transition-all duration-300 text-gray-700 placeholder-pink-300"
+                    >
+                </div>
+
+                <button 
+                    onclick="generateLink()"
+                    class="w-full bg-gradient-to-r from-pink-400 to-red-400 hover:from-pink-500 hover:to-red-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2"
+                >
+                    <span>Generate Magic Link</span>
+                    <span class="text-xl">✨</span>
+                </button>
+            </div>
+
+            <!-- Generated Link Section (hidden initially) -->
+            <div id="linkSection" class="hidden mt-8 p-5 bg-pink-50 rounded-2xl border-2 border-dashed border-pink-200">
+                <p class="text-pink-600 font-semibold mb-3 text-sm flex items-center gap-2">
+                    <span>🔗</span> Share this link with your Valentine:
+                </p>
+                <div class="flex gap-2">
+                    <input 
+                        type="text" 
+                        id="generatedLink" 
+                        readonly
+                        class="flex-1 px-4 py-3 bg-white border-2 border-pink-200 rounded-xl text-sm text-gray-600 focus:outline-none"
+                    >
+                    <button 
+                        onclick="copyLink()"
+                        class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
+                        title="Copy Link"
+                    >
+                        📋
+                    </button>
+                </div>
+                <p id="copyMessage" class="text-green-500 text-xs mt-2 hidden">✓ Copied to clipboard!</p>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-center text-pink-300 text-xs mt-8">
+                Made with 💖 for Valentine's Day
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Create floating hearts
+        function createHearts() {
+            const container = document.getElementById('hearts-container');
+            const hearts = ['💕', '💗', '💖', '💘', '❤️', '💓', '💞'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 100 + 'vh';
+                heart.style.animationDelay = Math.random() * 4 + 's';
+                heart.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+                container.appendChild(heart);
+            }
+        }
+        
+        createHearts();
+
+        function generateLink() {
+            const name = document.getElementById('valentineName').value.trim();
+            
+            if (!name) {
+                alert('Please enter your Valentine\'s name! 💕');
+                return;
+            }
+
+            // Get the base URL (works for both local and deployed)
+            const baseUrl = window.location.href.replace('index.html', '').replace(/\/$/, '');
+            const link = `${baseUrl}/valentine.html?name=${encodeURIComponent(name)}`;
+            
+            document.getElementById('generatedLink').value = link;
+            document.getElementById('linkSection').classList.remove('hidden');
+            document.getElementById('linkSection').classList.add('bounce-in');
+        }
+
+        function copyLink() {
+            const linkInput = document.getElementById('generatedLink');
+            linkInput.select();
+            document.execCommand('copy');
+            
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.classList.remove('hidden');
+            
+            setTimeout(() => {
+                copyMessage.classList.add('hidden');
+            }, 2000);
+        }
+
+        // Allow Enter key to generate link
+        document.getElementById('valentineName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateLink();
+            }
+        });
+    </script>
+</body>
+</html>
