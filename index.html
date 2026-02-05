@@ -55,6 +55,31 @@
             box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.3);
         }
     </style>
+    <script>
+        // Fix for social media tracking parameters breaking the URL
+        // When shared via Facebook, Messenger, etc., they add ?fbclid=... which breaks the path
+        (function() {
+            const fullUrl = window.location.href;
+            
+            // Check if URL contains valentine.html somewhere (broken by social media trackers)
+            if (fullUrl.includes('valentine.html')) {
+                // Extract the name parameter from the URL
+                const nameMatch = fullUrl.match(/[?&]name=([^&]+)/);
+                if (nameMatch) {
+                    const name = nameMatch[1];
+                    // Redirect to the correct valentine.html URL
+                    window.location.href = window.location.origin + '/valentine.html?name=' + name;
+                }
+            }
+            
+            // Also check if name parameter exists on index page (direct share issue)
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            if (name && !fullUrl.includes('valentine.html')) {
+                window.location.href = window.location.origin + '/valentine.html?name=' + encodeURIComponent(name);
+            }
+        })();
+    </script>
 </head>
 <body class="gradient-bg min-h-screen font-poppins overflow-hidden">
     <!-- Floating Hearts Background -->
@@ -159,7 +184,9 @@
             }
 
             // Get the base URL (works for both local and deployed)
-            const baseUrl = window.location.href.replace('index.html', '').replace(/\/$/, '');
+            const currentUrl = window.location.href;
+            // Remove any existing filename (index.html or other) and query strings
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
             const link = `${baseUrl}/valentine.html?name=${encodeURIComponent(name)}`;
             
             document.getElementById('generatedLink').value = link;
@@ -169,9 +196,45 @@
 
         function copyLink() {
             const linkInput = document.getElementById('generatedLink');
-            linkInput.select();
-            document.execCommand('copy');
+            const linkText = linkInput.value;
             
+            // Use modern Clipboard API (works better on mobile)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(linkText).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    // Fallback for older browsers
+                    fallbackCopy(linkInput);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(linkInput);
+            }
+        }
+        
+        function fallbackCopy(inputElement) {
+            // Create a temporary textarea for mobile compatibility
+            const textArea = document.createElement('textarea');
+            textArea.value = inputElement.value;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            textArea.style.top = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                alert('Please manually copy the link');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showCopySuccess() {
             const copyMessage = document.getElementById('copyMessage');
             copyMessage.classList.remove('hidden');
             
